@@ -1,0 +1,19 @@
+<div class="container">
+    <div [ngStyle]="{ 'height.px': scrollSettings.viewportHeight, overflow: 'auto' }" #container (scroll)="onTableScroll($event)"
+        class="wrapper">
+        <div [ngStyle]="{ 'height.px': scrollSettings.topPaddingHeight }"></div>
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2">The table header</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of renderedData" [ngStyle]="{ 'height.px': listSettings.itemHeightinPixels }">
+                    <td>{{item}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div [ngStyle]="{'height.px': scrollSettings.bottomPaddingHeight}"></div>
+    </div>
+</div>
