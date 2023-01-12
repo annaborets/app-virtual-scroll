@@ -23,14 +23,12 @@ export class VirtualScrollComponent implements OnInit, AfterViewInit {
     bottomPaddingHeight: 0
   };
 
-  public renderedData!: any[];
+  public renderedListPart!: any[];
 
   @Input() list: any[] = [];
   @Input() listSettings!: ListSettings;
 
-  @ViewChild('container') container!: ElementRef;
-
-  constructor() {}
+  @ViewChild('wrapper') wrapper!: ElementRef;
 
   ngOnInit(): void {
     const itemsAbove =
@@ -39,7 +37,7 @@ export class VirtualScrollComponent implements OnInit, AfterViewInit {
       this.listSettings.minIndex;
     this.scrollSettings.topPaddingHeight =
       itemsAbove * this.listSettings.itemHeightinPixels;
-    this.renderedData = this.getRenderedData(
+    this.renderedListPart = this.getRenderedData(
       this.scrollSettings.start,
       this.listSettings.itemsAmount
     );
@@ -48,15 +46,16 @@ export class VirtualScrollComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    const initialIndexPosition = this.scrollSettings.topPaddingHeight;
-    if (!initialIndexPosition) {
+    const initialScrollPosition = this.scrollSettings.topPaddingHeight;
+    if (!initialScrollPosition) {
       this.onTableScroll(0);
     }
-    this.container.nativeElement.scrollTop = initialIndexPosition;
+
+    this.wrapper.nativeElement.scrollTop = initialScrollPosition;
   }
 
   public onTableScroll(event: any): void {
-    const toleranceHeight =
+    const AdditionalItemsHeight =
       this.listSettings.additionalItems * this.listSettings.itemHeightinPixels;
     const endIndex =
       this.listSettings.itemsAmount + 2 * this.listSettings.additionalItems;
@@ -66,30 +65,32 @@ export class VirtualScrollComponent implements OnInit, AfterViewInit {
     const startIndex =
       this.listSettings.minIndex +
       Math.floor(
-        (event.target.scrollTop - toleranceHeight) /
+        (event.target.scrollTop - AdditionalItemsHeight) /
           this.listSettings.itemHeightinPixels
       );
     this.getRenderedData(startIndex, endIndex);
-    this.scrollSettings.topPaddingHeight = Math.max(
+    this.scrollSettings.topPaddingHeight =
       (startIndex - this.listSettings.minIndex) *
-        this.listSettings.itemHeightinPixels
-    );
-    this.scrollSettings.bottomPaddingHeight = Math.max(
+      this.listSettings.itemHeightinPixels;
+    this.scrollSettings.bottomPaddingHeight =
       totalHeight -
-        this.scrollSettings.topPaddingHeight -
-        this.list.length * this.listSettings.itemHeightinPixels
-    );
+      this.scrollSettings.topPaddingHeight -
+      this.list.length * this.listSettings.itemHeightinPixels;
   }
 
   private getRenderedData(startIndex: number, endIndex: number): any[] {
-    this.renderedData = [];
-    const start = Math.max(this.listSettings.minIndex, startIndex);
-    const end = Math.min(startIndex + endIndex - 1, this.listSettings.maxIndex);
-    if (start <= end) {
-      for (let i = start; i <= end; i++) {
-        this.renderedData.push(this.list[i]);
+    this.renderedListPart = [];
+    const startPoint = Math.max(this.listSettings.minIndex, startIndex);
+    const endPoint = Math.min(
+      startIndex + endIndex - 1,
+      this.listSettings.maxIndex
+    );
+    if (startPoint <= endPoint) {
+      for (let i = startPoint; i <= endPoint; i++) {
+        this.renderedListPart.push(this.list[i]);
       }
     }
-    return this.renderedData;
+
+    return this.renderedListPart;
   }
 }

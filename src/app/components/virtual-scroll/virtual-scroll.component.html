@@ -1,6 +1,8 @@
 <div class="container">
-    <div [ngStyle]="{ 'height.px': scrollSettings.viewportHeight, overflow: 'auto' }" #container (scroll)="onTableScroll($event)"
-        class="wrapper">
+    <div [ngStyle]="{ 'height.px': scrollSettings.viewportHeight }" 
+         #wrapper 
+         (scroll)="onTableScroll($event)"
+         class="wrapper">
         <div [ngStyle]="{ 'height.px': scrollSettings.topPaddingHeight }"></div>
         <table>
             <thead>
@@ -9,8 +11,9 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let item of renderedData" [ngStyle]="{ 'height.px': listSettings.itemHeightinPixels }">
-                    <td>{{item}}</td>
+                <tr *ngFor="let item of renderedListPart" 
+                    [ngStyle]="{ 'height.px': listSettings.itemHeightinPixels }">
+                    <td>{{ item }}</td>
                 </tr>
             </tbody>
         </table>

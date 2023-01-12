@@ -10,7 +10,7 @@ export class AppComponent implements OnInit {
   public list: string[] = [];
   public listSettings: ListSettings = {
     minIndex: 0,
-    maxIndex: 100,
+    maxIndex: 1000,
     startIndex: 1,
     itemHeightinPixels: 60,
     itemsAmount: 10,
