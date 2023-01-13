@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ListSettings } from './models/settings';
+import { ItemsSettings } from './models/settings';
 
 @Component({
   selector: 'app-root',
@@ -7,26 +7,25 @@ import { ListSettings } from './models/settings';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  public list: string[] = [];
-  public listSettings: ListSettings = {
-    minIndex: 0,
-    maxIndex: 1000,
-    startIndex: 1,
-    itemHeightinPixels: 60,
-    itemsAmount: 10,
+  public items: string[] = [];
+  public itemsSettings: ItemsSettings = {
+    // startIndex: 1,
+    itemHeight: 60,
+    viewportHeight: 600,
+    // itemsAmount: 10,
     additionalItems: 2
   };
 
   ngOnInit() {
-    this.generateList(1000);
+    this.generateItems(1000);
   }
 
-  public generateList(length: number): string[] {
+  public generateItems(length: number): string[] {
     if (1 <= length) {
       for (let i = 1; i <= length; i++) {
-        this.list.push(`Item №${i}`);
+        this.items.push(`Item №${i}`);
       }
     }
-    return this.list;
+    return this.items;
   }
 }

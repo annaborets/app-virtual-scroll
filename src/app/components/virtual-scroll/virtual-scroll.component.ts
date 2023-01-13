@@ -7,7 +7,7 @@ import {
   AfterViewInit
 } from '@angular/core';
 
-import { ListSettings, ScrollSettings } from 'src/app/models/settings';
+import { ItemsSettings, ScrollSettings } from 'src/app/models/settings';
 
 @Component({
   selector: 'app-virtual-scroll',
@@ -16,37 +16,33 @@ import { ListSettings, ScrollSettings } from 'src/app/models/settings';
 })
 export class VirtualScrollComponent implements OnInit, AfterViewInit {
   public scrollSettings: ScrollSettings = {
-    viewportHeight: 0,
-    start: 0,
-    visibleRows: 0,
-    topPaddingHeight: 0,
-    bottomPaddingHeight: 0
+    itemsAbove: 0,
+    itemsBelow: 0,
+    renderedItemsAmount: 0,
+    topOffsetHeight: 0,
+    bottomOffsetHeight: 0
   };
 
-  public renderedListPart!: any[];
+  public renderedItems!: any[];
 
-  @Input() list: any[] = [];
-  @Input() listSettings!: ListSettings;
+  @Input() items: any[] = [];
+  @Input() itemsSettings!: ItemsSettings;
 
   @ViewChild('wrapper') wrapper!: ElementRef;
 
   ngOnInit(): void {
-    const itemsAbove =
-      this.listSettings.startIndex -
-      this.listSettings.additionalItems -
-      this.listSettings.minIndex;
-    this.scrollSettings.topPaddingHeight =
-      itemsAbove * this.listSettings.itemHeightinPixels;
-    this.renderedListPart = this.getRenderedData(
-      this.scrollSettings.start,
-      this.listSettings.itemsAmount
+    this.scrollSettings.renderedItemsAmount =
+      this.itemsSettings.viewportHeight / this.itemsSettings.itemHeight;
+    this.renderedItems = this.getRenderedData(
+      0,
+      this.scrollSettings.renderedItemsAmount
     );
-    this.scrollSettings.viewportHeight =
-      this.listSettings.itemHeightinPixels * this.listSettings.itemsAmount;
+    this.calculateBottomOffsetHeight();
+    console.log(this.wrapper.nativeElement.scrollTop);
   }
 
   ngAfterViewInit(): void {
-    const initialScrollPosition = this.scrollSettings.topPaddingHeight;
+    const initialScrollPosition = this.scrollSettings.topOffsetHeight;
     if (!initialScrollPosition) {
       this.onTableScroll(0);
     }
@@ -56,41 +52,46 @@ export class VirtualScrollComponent implements OnInit, AfterViewInit {
 
   public onTableScroll(event: any): void {
     const AdditionalItemsHeight =
-      this.listSettings.additionalItems * this.listSettings.itemHeightinPixels;
+      this.itemsSettings.additionalItems * this.itemsSettings.itemHeight;
     const endIndex =
-      this.listSettings.itemsAmount + 2 * this.listSettings.additionalItems;
-    const totalHeight =
-      (this.listSettings.maxIndex - this.listSettings.minIndex + 1) *
-      this.listSettings.itemHeightinPixels;
+      this.scrollSettings.renderedItemsAmount +
+      2 * this.itemsSettings.additionalItems;
     const startIndex =
-      this.listSettings.minIndex +
+      1 +
       Math.floor(
         (event.target.scrollTop - AdditionalItemsHeight) /
-          this.listSettings.itemHeightinPixels
+          this.itemsSettings.itemHeight
       );
     this.getRenderedData(startIndex, endIndex);
-    this.scrollSettings.topPaddingHeight =
-      (startIndex - this.listSettings.minIndex) *
-      this.listSettings.itemHeightinPixels;
-    this.scrollSettings.bottomPaddingHeight =
-      totalHeight -
-      this.scrollSettings.topPaddingHeight -
-      this.list.length * this.listSettings.itemHeightinPixels;
+    this.calculateTopOffsetHeight(startIndex);
+    this.calculateBottomOffsetHeight();
   }
 
   private getRenderedData(startIndex: number, endIndex: number): any[] {
-    this.renderedListPart = [];
-    const startPoint = Math.max(this.listSettings.minIndex, startIndex);
-    const endPoint = Math.min(
-      startIndex + endIndex - 1,
-      this.listSettings.maxIndex
-    );
+    this.renderedItems = [];
+    const startPoint = Math.max(0, startIndex);
+    const endPoint = Math.min(startIndex + endIndex - 1, this.items.length);
     if (startPoint <= endPoint) {
       for (let i = startPoint; i <= endPoint; i++) {
-        this.renderedListPart.push(this.list[i]);
+        this.renderedItems.push(this.items[i]);
       }
     }
+    return this.renderedItems;
+  }
 
-    return this.renderedListPart;
+  private calculateTopOffsetHeight(startIndex: number) {
+    this.scrollSettings.itemsAbove = startIndex - 1;
+    this.scrollSettings.topOffsetHeight =
+      this.scrollSettings.itemsAbove * this.itemsSettings.itemHeight;
+  }
+
+  private calculateBottomOffsetHeight() {
+    this.scrollSettings.itemsBelow =
+      this.items.length -
+      this.itemsSettings.additionalItems * 2 -
+      this.scrollSettings.itemsAbove -
+      this.renderedItems.length;
+    this.scrollSettings.bottomOffsetHeight =
+      this.scrollSettings.itemsBelow * this.itemsSettings.itemHeight;
   }
 }

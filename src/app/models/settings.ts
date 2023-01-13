@@ -1,16 +1,14 @@
-export interface ListSettings {
-  minIndex: number;
-  maxIndex: number;
-  startIndex: number;
-  itemHeightinPixels: number;
-  itemsAmount: number;
+export interface ItemsSettings {
+  // startIndex: number;
+  itemHeight: number;
+  viewportHeight: number;
   additionalItems: number;
 }
 
 export interface ScrollSettings {
-  viewportHeight: number;
-  start: number;
-  visibleRows: number;
-  topPaddingHeight: number;
-  bottomPaddingHeight: number;
+  itemsAbove: number;
+  itemsBelow: number;
+  renderedItemsAmount: number;
+  topOffsetHeight: number;
+  bottomOffsetHeight: number;
 }
